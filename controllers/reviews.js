@@ -1,6 +1,6 @@
 const Listing = require("../models/listing");
 const Review = require("../models/review");
-const ExpressError = require("../utils/expressError");
+const ExpressError = require("../utils/ExpressError");
 
 const refreshListingRating = async (listing) => {
     const ratings = await Review.find({ _id: { $in: listing.reviews } }).select("rating").lean();

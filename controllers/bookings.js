@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Booking = require("../models/booking");
 const Listing = require("../models/listing");
-const ExpressError = require("../utils/expressError");
+const ExpressError = require("../utils/ExpressError");
 
 const parseDate = (value) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;

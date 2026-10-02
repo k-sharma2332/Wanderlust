@@ -3,7 +3,7 @@ const Review = require(`./models/review.js`)
 const { listingSchema } = require(`./schema.js`);
 const { reviewSchema } = require(`./schema.js`);
 const { bookingSchema } = require("./schema.js");
-const ExpressError = require(`./utils/expressError.js`);
+const ExpressError = require(`./utils/ExpressError.js`);
 const multer = require("multer");
 const listingImageUpload = multer({
     storage: multer.memoryStorage(),

@@ -1,4 +1,4 @@
-const ExpressError = require("./expressError");
+const ExpressError = require("./ExpressError");
 
 const windowMs = 15 * 60 * 1000;
 const maxRequests = 12;

@@ -1,7 +1,7 @@
 const fs = require("fs/promises");
 const path = require("path");
 const { randomUUID } = require("crypto");
-const ExpressError = require("./expressError");
+const ExpressError = require("./ExpressError");
 
 const imageDirectory = path.join(__dirname, "..", "public", "uploads", "listings");
 const formats = [

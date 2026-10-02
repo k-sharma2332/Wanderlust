@@ -4,7 +4,7 @@ const Listing = require("../models/listing");
 const Review = require("../models/review");
 const Booking = require("../models/booking");
 const Wishlist = require("../models/wishlist");
-const ExpressError = require("../utils/expressError");
+const ExpressError = require("../utils/ExpressError");
 const { deleteListingImages } = require("../utils/listingImages");
 
 module.exports.dashboard = async (req, res) => {
