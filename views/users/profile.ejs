@@ -1,0 +1,74 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Your profile" %>
+
+<section class="profile-hero">
+    <span class="profile-avatar profile-avatar-large" aria-hidden="true"><%= profileUser.username.charAt(0).toUpperCase() %></span>
+    <div>
+        <span class="eyebrow">YOUR WANDERLUST</span>
+        <h1><%= profileUser.username %></h1>
+        <p><%= profileUser.email %></p>
+    </div>
+    <div class="profile-stats">
+        <span><strong><%= savedListings.length %></strong> saved <%= savedListings.length === 1 ? "stay" : "stays" %></span>
+        <span><strong><%= hostedListings.length %></strong> <%= hostedListings.length === 1 ? "listing" : "listings" %></span>
+    </div>
+</section>
+
+<section class="profile-section" aria-labelledby="profile-saved-heading">
+    <div class="profile-section-heading">
+        <div><span class="eyebrow">KEPT CLOSE</span><h2 id="profile-saved-heading">Your saved stays</h2></div>
+        <a href="/wishlist" class="btn btn-outline-brand btn-sm">Open wishlist</a>
+    </div>
+    <% if (savedListings.length) { %>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            <% for (const listing of savedListings) { %>
+                <div class="col">
+                    <article class="card h-100 listing-card">
+                        <a href="/listings/<%= listing._id %>" class="listing-card-link">
+                            <div class="listing-image-wrap"><img src="<%= listing.image %>" class="card-img-top" alt="<%= listing.title %>" loading="lazy"></div>
+                            <div class="card-body">
+                                <div class="listing-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <%= listing.location %>, <%= listing.country %></div>
+                                <h3 class="card-title"><%= listing.title %></h3>
+                                <p class="listing-price"><strong>₹<%= listing.price.toLocaleString("en-IN") %></strong> <span>per night</span></p>
+                            </div>
+                        </a>
+                        <form class="saved-card-action" action="/wishlist/<%= listing._id %>?_method=DELETE" method="post">
+                            <button type="submit" class="btn btn-light btn-sm"><i class="fa-solid fa-heart" aria-hidden="true"></i> Remove saved stay</button>
+                        </form>
+                    </article>
+                </div>
+            <% } %>
+        </div>
+    <% } else { %>
+        <div class="empty-state profile-empty" role="status">
+            <span class="empty-state-icon"><i class="fa-regular fa-heart" aria-hidden="true"></i></span>
+            <h3>Your wishlist starts here</h3>
+            <p>Save the stays that catch your eye and they’ll be waiting for you here.</p>
+            <a href="/listings" class="btn btn-brand">Explore stays</a>
+        </div>
+    <% } %>
+</section>
+
+<section class="profile-section" aria-labelledby="profile-hosted-heading">
+    <div class="profile-section-heading">
+        <div><span class="eyebrow">YOUR HOSTING</span><h2 id="profile-hosted-heading">Stays you’ve shared</h2></div>
+        <a href="/listings/new" class="btn btn-outline-brand btn-sm"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add a stay</a>
+    </div>
+    <% if (hostedListings.length) { %>
+        <div class="hosted-list">
+            <% for (const listing of hostedListings) { %>
+                <a class="hosted-list-item" href="/listings/<%= listing._id %>">
+                    <img src="<%= listing.image %>" alt="" loading="lazy">
+                    <span><strong><%= listing.title %></strong><small><%= listing.location %>, <%= listing.country %></small></span>
+                    <span class="hosted-price">₹<%= listing.price.toLocaleString("en-IN") %> / night</span>
+                    <i class="fa-solid fa-chevron-right hosted-chevron" aria-hidden="true"></i>
+                </a>
+            <% } %>
+        </div>
+    <% } else { %>
+        <div class="profile-empty-host">
+            <p>You haven’t shared a stay yet. Have a space travelers would love?</p>
+            <a href="/listings/new">Create your first listing <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    <% } %>
+</section>

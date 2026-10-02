@@ -1,0 +1,35 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Platform dashboard" %>
+
+<section class="dashboard-welcome admin-welcome">
+    <div><span class="eyebrow">WANDERLUST OPERATIONS</span><h1>Platform overview</h1><p>A clear view of the community and its activity.</p></div>
+    <span class="admin-badge"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Administrator</span>
+</section>
+<nav class="dashboard-nav" aria-label="Administration sections">
+    <a href="/admin"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Overview</a>
+    <a href="/admin/users"><i class="fa-solid fa-users" aria-hidden="true"></i> Users</a>
+    <a href="/admin/listings"><i class="fa-solid fa-house" aria-hidden="true"></i> Listings</a>
+    <a href="/admin/reviews"><i class="fa-solid fa-star" aria-hidden="true"></i> Reviews</a>
+</nav>
+<section class="dashboard-section">
+    <div class="dashboard-section-heading"><div><span class="eyebrow">COMMUNITY SNAPSHOT</span><h2>Platform statistics</h2></div></div>
+    <div class="dashboard-metrics admin-metrics">
+        <%- include('./_metric.ejs', { icon: 'fa-solid fa-users', label: 'Total users', value: totalUsers, detail: 'Registered accounts', title: '' }) %>
+        <%- include('./_metric.ejs', { icon: 'fa-solid fa-house', label: 'Total listings', value: totalListings, detail: 'Published stays', title: '' }) %>
+        <%- include('./_metric.ejs', { icon: 'fa-regular fa-calendar-check', label: 'Total bookings', value: totalBookings, detail: 'All request statuses', title: '' }) %>
+        <%- include('./_metric.ejs', { icon: 'fa-solid fa-star', label: 'Total reviews', value: totalReviews, detail: 'Community feedback', title: '' }) %>
+    </div>
+</section>
+<section class="dashboard-section">
+    <div class="dashboard-section-heading"><div><span class="eyebrow">REQUEST HEALTH</span><h2>Booking requests by status</h2></div></div>
+    <div class="status-overview">
+        <% const statusLabels = ["pending", "confirmed", "rejected", "cancelled"]; %>
+        <% for (const status of statusLabels) { const item = bookingsByStatus.find((entry) => entry._id === status); %>
+            <div><span class="status-pill status-<%= status %>"><%= status %></span><strong><%= item ? item.count : 0 %></strong></div>
+        <% } %>
+    </div>
+</section>
+<section class="dashboard-section">
+    <div class="dashboard-section-heading"><div><span class="eyebrow">RECENT ACTIVITY</span><h2>Newly shared stays</h2></div><a href="/admin/listings" class="dashboard-text-link">Manage listings <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+    <% if (recentListings.length) { %><div class="dashboard-rows"><% for (const listing of recentListings) { %><a class="dashboard-row admin-listing-row" href="/listings/<%= listing._id %>"><span><strong><%= listing.title %></strong><small><%= listing.location %>, <%= listing.country %> · <%= listing.createdAt.toLocaleDateString("en-IN") %></small></span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a><% } %></div><% } else { %><div class="dashboard-empty"><p>No listings have been published yet.</p><a href="/admin/listings">View listing management</a></div><% } %>
+</section>

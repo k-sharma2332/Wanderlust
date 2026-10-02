@@ -1,0 +1,77 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Your dashboard" %>
+
+<section class="dashboard-welcome">
+    <div><span class="eyebrow"><%= isHost ? "TRAVELER & HOST SPACE" : "YOUR TRAVEL SPACE" %></span><h1>Good to see you, <%= user.username %>.</h1><p>All the little pieces of your Wanderlust journey, together.</p></div>
+    <span class="profile-avatar profile-avatar-large" aria-hidden="true"><%= user.username.charAt(0).toUpperCase() %></span>
+</section>
+
+<nav class="dashboard-nav" aria-label="Dashboard sections">
+    <a href="#overview"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Overview</a>
+    <a href="/profile"><i class="fa-regular fa-user" aria-hidden="true"></i> Profile</a>
+    <a href="#my-listings"><i class="fa-solid fa-house" aria-hidden="true"></i> My listings</a>
+    <a href="/wishlist"><i class="fa-regular fa-heart" aria-hidden="true"></i> Wishlist</a>
+    <a href="#my-reviews"><i class="fa-regular fa-star" aria-hidden="true"></i> My reviews</a>
+    <a href="/bookings"><i class="fa-regular fa-calendar" aria-hidden="true"></i> My bookings</a>
+    <% if (isHost) { %><a href="#host"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Host dashboard</a><a href="/host/bookings"><i class="fa-regular fa-envelope" aria-hidden="true"></i> Requests</a><% } %>
+</nav>
+
+<section id="overview" class="dashboard-section">
+    <div class="dashboard-section-heading"><div><span class="eyebrow">YOUR OVERVIEW</span><h2>Travel, all in one place</h2></div></div>
+    <div class="dashboard-metrics">
+        <%- include('./_metric.ejs', { icon: 'fa-regular fa-calendar', label: 'My bookings', value: travelerBookings.length, detail: 'Recent requests', title: '' }) %>
+        <%- include('./_metric.ejs', { icon: 'fa-regular fa-heart', label: 'Saved stays', value: savedCount, detail: 'In your wishlist', title: '' }) %>
+        <%- include('./_metric.ejs', { icon: 'fa-regular fa-star', label: 'My reviews', value: reviewCount, detail: 'Reviews you have written', title: '' }) %>
+        <%- include('./_metric.ejs', { icon: 'fa-solid fa-house', label: 'My listings', value: hostListingCount, detail: isHost ? 'Hosting on Wanderlust' : 'Become a host anytime', title: '' }) %>
+    </div>
+</section>
+
+<section id="my-reviews" class="dashboard-section">
+    <div class="dashboard-section-heading"><div><span class="eyebrow">NEXT UP</span><h2>Recent bookings</h2></div><a href="/bookings" class="dashboard-text-link">All bookings <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+    <% if (travelerBookings.length) { %>
+        <div class="dashboard-rows">
+            <% for (const booking of travelerBookings) { %>
+                <a class="dashboard-row" href="/bookings/<%= booking._id %>">
+                    <img src="<%= booking.listing ? booking.listing.image : booking.listingSnapshot.image %>" alt="" loading="lazy">
+                    <span><strong><%= booking.listing ? booking.listing.title : booking.listingSnapshot.title %></strong><small><%= booking.checkIn.toLocaleDateString("en-IN", {day:"numeric",month:"short",timeZone:"UTC"}) %> – <%= booking.checkOut.toLocaleDateString("en-IN", {day:"numeric",month:"short",timeZone:"UTC"}) %></small></span>
+                    <span class="status-pill status-<%= booking.status %>"><%= booking.status %></span>
+                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </a>
+            <% } %>
+        </div>
+    <% } else { %><div class="dashboard-empty"><p>Your next trip hasn’t been booked yet.</p><a href="/listings">Find a stay <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div><% } %>
+</section>
+
+<section class="dashboard-section">
+    <div class="dashboard-section-heading"><div><span class="eyebrow">YOUR WORDS</span><h2>Recent reviews</h2></div><a href="/profile" class="dashboard-text-link">Your profile <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+    <% if (reviews.length) { %><div class="dashboard-review-grid">
+        <% for (const review of reviews) { %><article class="dashboard-review-card"><p class="starability-result" data-rating="<%= review.rating %>"></p><p><%= review.comment %></p><small><%= review.listing ? review.listing.title : "Wanderlust stay" %></small></article><% } %>
+    </div><% } else { %><div class="dashboard-empty"><p>Your review history will appear here.</p><a href="/listings">Explore stays <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div><% } %>
+</section>
+
+<% if (isHost) { %>
+    <section id="my-listings" class="dashboard-section">
+        <div class="dashboard-section-heading"><div><span class="eyebrow">YOUR PROPERTIES</span><h2>My listings</h2></div><a href="/listings/new" class="btn btn-outline-brand btn-sm"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add a stay</a></div>
+        <% if (hostedListings.length) { %><div class="dashboard-rows">
+            <% for (const listing of hostedListings) { %><div class="dashboard-row dashboard-listing-management"><img src="<%= listing.image %>" alt="" loading="lazy"><a href="/listings/<%= listing._id %>" class="dashboard-row-copy"><strong><%= listing.title %></strong><small><%= listing.location %>, <%= listing.country %> · ₹<%= listing.price.toLocaleString("en-IN") %> / night · <%= listing.ratingCount || 0 %> reviews</small></a><a class="btn btn-light btn-sm" href="/listings/<%= listing._id %>/edit">Edit</a></div><% } %>
+        </div><% } else { %><div class="dashboard-empty"><p>You haven’t shared a stay yet.</p><a href="/listings/new">Create your first listing <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div><% } %>
+    </section>
+    <section id="host" class="dashboard-section host-dashboard-section">
+        <div class="dashboard-section-heading"><div><span class="eyebrow">YOUR HOST SPACE</span><h2>Hosting at a glance</h2></div><a href="/listings/new" class="btn btn-outline-brand btn-sm"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add a stay</a></div>
+        <div class="dashboard-metrics host-metrics">
+            <%- include('./_metric.ejs', { icon: 'fa-solid fa-house', label: 'Total listings', value: hostListingCount, detail: 'Your published stays', title: '' }) %>
+            <%- include('./_metric.ejs', { icon: 'fa-regular fa-calendar-check', label: 'Total bookings', value: hostBookingCount, detail: 'All-time requests', title: '' }) %>
+            <%- include('./_metric.ejs', { icon: 'fa-regular fa-bell', label: 'Pending requests', value: pendingCount, detail: 'Waiting for your reply', title: '' }) %>
+            <%- include('./_metric.ejs', { icon: 'fa-solid fa-star', label: 'Average rating', value: averageRating.toFixed(1), detail: 'Across your stays', title: '' }) %>
+        </div>
+        <div class="dashboard-section-heading dashboard-subheading"><h3>Recent guest requests</h3><a href="/host/bookings" class="dashboard-text-link">Manage bookings <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+        <% if (hostedBookings.length) { %><div class="dashboard-rows">
+            <% for (const booking of hostedBookings) { %><a class="dashboard-row" href="/bookings/<%= booking._id %>"><img src="<%= booking.listing ? booking.listing.image : booking.listingSnapshot.image %>" alt="" loading="lazy"><span><strong><%= booking.listing ? booking.listing.title : booking.listingSnapshot.title %></strong><small><%= booking.traveler ? booking.traveler.username : "Traveler" %> · <%= booking.guests %> guests</small></span><span class="status-pill status-<%= booking.status %>"><%= booking.status %></span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></a><% } %>
+        </div><% } else { %><div class="dashboard-empty"><p>No guest requests yet.</p><a href="/listings/new">Create a listing <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div><% } %>
+    </section>
+<% } else { %>
+    <section id="my-listings" class="dashboard-section">
+        <div class="dashboard-section-heading"><div><span class="eyebrow">YOUR PROPERTIES</span><h2>My listings</h2></div><a href="/listings/new" class="btn btn-outline-brand btn-sm"><i class="fa-solid fa-plus" aria-hidden="true"></i> Become a host</a></div>
+        <div class="dashboard-empty"><p>Share a place you love with the Wanderlust community.</p><a href="/listings/new">Create your first listing <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+    </section>
+<% } %>

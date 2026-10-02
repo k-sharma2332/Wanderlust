@@ -1,0 +1,175 @@
+<% layout('/layouts/boilerplate') %>
+<% title = listing.title %>
+<% const gallery = listing.images && listing.images.length ? listing.images : [{ url: listing.image, filename: "" }] %>
+<% const ownReview = user ? listing.reviews.find((review) => review.author && String(review.author._id) === String(user._id)) : null %>
+<% const isListingOwner = user && listing.owner && String(user._id) === String(listing.owner._id) %>
+
+<a href="/listings" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to stays</a>
+<section class="listing-detail mt-3">
+    <div class="detail-image-wrap">
+        <div class="detail-gallery">
+            <% for (const [index, image] of gallery.entries()) { %>
+                <img src="<%= image.url %>" class="detail-image" alt="<%= listing.title %> photo <%= index + 1 %>" loading="<%= index === 0 ? "eager" : "lazy" %>" <%= index === 0 ? 'fetchpriority="high"' : "" %>>
+            <% } %>
+        </div>
+    </div>
+    <div class="detail-content">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+            <div>
+                <span class="eyebrow text-muted"><%= (listing.propertyType || "stay").replace(/-/g, " ") %> · <%= listing.country %> · <%= listing.location %></span>
+                <h1 class="detail-title"><%= listing.title %></h1>
+                <% if (listing.ratingCount) { %>
+                    <p class="listing-rating" aria-label="Average rating <%= listing.averageRating %> out of 5 from <%= listing.ratingCount %> reviews">
+                        <i class="fa-solid fa-star" aria-hidden="true"></i> <strong><%= listing.averageRating.toFixed(1) %></strong>
+                        <span>(<%= listing.ratingCount %> <%= listing.ratingCount === 1 ? "review" : "reviews" %>)</span>
+                    </p>
+                <% } %>
+            </div>
+            <% if (user && listing.owner && String(user._id) === String(listing.owner._id)) { %>
+                <span class="owner-pill"><i class="fa-solid fa-house"></i> Your listing</span>
+            <% } %>
+        </div>
+        <p class="host-line"><i class="fa-regular fa-user" aria-hidden="true"></i> Hosted by <strong><%= listing.owner ? listing.owner.username : "Wanderlust host" %></strong></p>
+        <p class="detail-description"><%= listing.description %></p>
+        <div class="listing-facts" aria-label="Property details">
+            <span><i class="fa-solid fa-user-group" aria-hidden="true"></i><strong><%= listing.maximumGuests || 2 %></strong> guests</span>
+            <span><i class="fa-solid fa-bed" aria-hidden="true"></i><strong><%= listing.bedrooms ?? 1 %></strong> bedrooms</span>
+            <span><i class="fa-solid fa-bath" aria-hidden="true"></i><strong><%= listing.bathrooms || 1 %></strong> baths</span>
+        </div>
+        <% if (listing.amenities && listing.amenities.length) { %>
+            <section class="amenities-display" aria-labelledby="amenities-heading">
+                <h2 id="amenities-heading">What this place offers</h2>
+                <div class="amenities-display-list">
+                    <% for (const amenity of listing.amenities) { %>
+                        <span><i class="fa-solid fa-check" aria-hidden="true"></i><%= amenity.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) %></span>
+                    <% } %>
+                </div>
+            </section>
+        <% } %>
+        <% if (Number.isFinite(listing.latitude) && Number.isFinite(listing.longitude)) { %>
+            <p class="coordinate-note"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
+                <a href="https://www.openstreetmap.org/?mlat=<%= listing.latitude %>&mlon=<%= listing.longitude %>#map=14/<%= listing.latitude %>/<%= listing.longitude %>" target="_blank" rel="noopener noreferrer">View approximate location</a>
+            </p>
+        <% } %>
+        <p class="listing-created">Listed <time datetime="<%= listing.createdAt.toISOString() %>"><%= listing.createdAt.toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" }) %></time></p>
+        <div class="detail-price"><strong>₹<%= listing.price.toLocaleString("en-IN") %></strong> <span>per night</span></div>
+        <% if (!isListingOwner && listing.owner) { %>
+            <div class="action-row booking-action-row">
+                <a href="/listings/<%= listing._id %>/bookings" class="btn btn-brand"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Request these dates</a>
+            </div>
+        <% } %>
+        <% if (user) { %>
+            <form class="detail-wishlist-form" action="/wishlist/<%= listing._id %><%= isSaved ? '?_method=DELETE' : '' %>" method="post">
+                <button type="submit" class="btn <%= isSaved ? 'btn-outline-brand' : 'btn-light' %>">
+                    <i class="<%= isSaved ? 'fa-solid' : 'fa-regular' %> fa-heart" aria-hidden="true"></i>
+                    <%= isSaved ? 'Remove from wishlist' : 'Save to wishlist' %>
+                </button>
+            </form>
+        <% } else { %>
+            <a class="save-prompt" href="/login"><i class="fa-regular fa-heart" aria-hidden="true"></i> Log in to save this stay</a>
+        <% } %>
+        <% if (user && listing.owner && String(user._id) === String(listing.owner._id)) { %>
+            <div class="action-row">
+                <a href="/listings/<%= listing._id %>/edit" class="btn btn-brand">Edit listing</a>
+                <form action="/listings/<%= listing._id %>?_method=DELETE" method="post" onsubmit="return confirm('Delete this listing and its reviews?')" data-loading-label="Deleting...">
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
+</section>
+
+<% if (enableLeaflet) { %>
+    <section class="listing-map-section" aria-labelledby="listing-map-heading">
+        <div class="section-heading"><div><span class="eyebrow">FIND YOUR WAY</span><h2 id="listing-map-heading" class="section-title">Approximate location</h2></div></div>
+        <p class="map-privacy-note">The marker uses coordinates provided by the host. It may not indicate the exact property entrance.</p>
+        <div id="listingMap" class="listing-map" role="application" aria-label="Interactive OpenStreetMap location map"
+            data-latitude="<%= listing.latitude %>" data-longitude="<%= listing.longitude %>" data-title="<%= listing.title %>"></div>
+        <a class="map-external-link" href="https://www.openstreetmap.org/?mlat=<%= listing.latitude %>&mlon=<%= listing.longitude %>#map=14/<%= listing.latitude %>/<%= listing.longitude %>" target="_blank" rel="noopener noreferrer">Open map in OpenStreetMap <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+    </section>
+<% } else { %>
+    <section class="listing-map-section map-unavailable" aria-labelledby="listing-map-heading">
+        <span class="eyebrow">LOCATION</span>
+        <h2 id="listing-map-heading" class="section-title">Map location unavailable</h2>
+        <p class="map-privacy-note">The host hasn’t added map coordinates for this stay yet. You can still view its listed location above.</p>
+    </section>
+<% } %>
+
+<section class="reviews-section">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow text-muted">TRAVELER NOTES</span>
+            <h2 class="section-title">Reviews <span class="count-badge"><%= listing.reviews.length %></span></h2>
+        </div>
+    </div>
+    <% if (user && !isListingOwner && !ownReview) { %>
+        <form action="/listings/<%= listing._id %>/reviews" method="post" class="review-form" data-loading-label="Publishing...">
+            <div class="review-form-header">
+                <h3>Share your experience</h3>
+                <span class="text-muted small">Your review helps fellow travelers.</span>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="comment" class="form-label">Comment</label>
+                    <textarea name="review[comment]" id="comment" rows="3" class="form-control" placeholder="What did you love about this stay?" required minlength="3" maxlength="1000"></textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label d-block">Rating</label>
+                    <fieldset class="starability-slot">
+                        <input type="radio" id="first-rate1" name="review[rating]" value="1" required /><label for="first-rate1" title="Terrible">1 star</label>
+                        <input type="radio" id="first-rate2" name="review[rating]" value="2" /><label for="first-rate2" title="Not good">2 stars</label>
+                        <input type="radio" id="first-rate3" name="review[rating]" value="3" /><label for="first-rate3" title="Average">3 stars</label>
+                        <input type="radio" id="first-rate4" name="review[rating]" value="4" /><label for="first-rate4" title="Very good">4 stars</label>
+                        <input type="radio" id="first-rate5" name="review[rating]" value="5" /><label for="first-rate5" title="Amazing">5 stars</label>
+                    </fieldset>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-dark mt-3">Publish review</button>
+        </form>
+    <% } else if (!user) { %>
+        <div class="login-prompt"><i class="fa-regular fa-comment-dots"></i><span>Have you stayed here? <a href="/login">Log in</a> to leave a review.</span></div>
+    <% } else if (isListingOwner) { %>
+        <div class="review-rule-note"><i class="fa-solid fa-house-user" aria-hidden="true"></i> Hosts can’t review their own listing.</div>
+    <% } else { %>
+        <div class="review-rule-note"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i> You’ve already reviewed this stay. You can update your review below.</div>
+    <% } %>
+
+    <% if (listing.reviews.length) { %>
+        <div class="review-grid mt-4">
+            <% for (const review of listing.reviews) { %>
+                <article class="review-card">
+                    <div class="review-card-top">
+                        <div class="review-avatar"><%= (review.authorName || "G").charAt(0).toUpperCase() %></div>
+                        <div><h3><%= review.authorName || "Guest" %></h3><p class="review-date"><%= review.createdAt.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" }) %></p></div>
+                        <% if (ownReview && String(ownReview._id) === String(review._id)) { %>
+                            <form class="ms-auto review-delete-form" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="post" onsubmit="return confirm('Delete this review?')"><button class="icon-button" aria-label="Delete your review"><i class="fa-regular fa-trash-can"></i></button></form>
+                        <% } %>
+                    </div>
+                    <p class="starability-result" data-rating="<%= review.rating %>"></p>
+                    <p class="review-comment"><%= review.comment %></p>
+                    <% if (ownReview && String(ownReview._id) === String(review._id)) { %>
+                        <details class="review-edit">
+                            <summary><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i> Edit your review</summary>
+                            <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=PUT" method="post" data-loading-label="Saving review...">
+                                <label class="form-label" for="edit-comment-<%= review._id %>">Comment</label>
+                                <textarea id="edit-comment-<%= review._id %>" name="review[comment]" rows="3" class="form-control" required minlength="3" maxlength="1000"><%= review.comment %></textarea>
+                                <fieldset class="starability-slot mt-3">
+                                    <% for (let rating = 1; rating <= 5; rating++) { %>
+                                        <input type="radio" id="edit-rating-<%= review._id %>-<%= rating %>" name="review[rating]" value="<%= rating %>" <%= review.rating === rating ? "checked" : "" %> <%= rating === 1 ? "required" : "" %>>
+                                        <label for="edit-rating-<%= review._id %>-<%= rating %>" title="<%= rating %> star<%= rating === 1 ? "" : "s" %>"><%= rating %> star<%= rating === 1 ? "" : "s" %></label>
+                                    <% } %>
+                                </fieldset>
+                                <button type="submit" class="btn btn-brand btn-sm mt-2">Save review</button>
+                            </form>
+                        </details>
+                    <% } %>
+                </article>
+            <% } %>
+        </div>
+    <% } else { %>
+        <div class="empty-review-state" role="status">
+            <span class="review-empty-icon"><i class="fa-regular fa-comments" aria-hidden="true"></i></span>
+            <div><h3>No reviews yet</h3><p>Be the first to share what this stay was like.</p></div>
+        </div>
+    <% } %>
+</section>

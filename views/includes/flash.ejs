@@ -1,0 +1,17 @@
+<% if (success && success.length) { %>
+    <% for (const message of success) { %>
+        <div class="alert alert-success alert-dismissible fade show app-alert" role="status">
+            <i class="fa-regular fa-circle-check" aria-hidden="true"></i><span><%= message %></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+<% } %>
+
+<% if (error && error.length) { %>
+    <% for (const message of error) { %>
+        <div class="alert alert-danger alert-dismissible fade show app-alert" role="alert">
+            <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i><span><%= message %></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+<% } %>

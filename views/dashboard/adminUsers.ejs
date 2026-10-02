@@ -1,0 +1,14 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Manage users" %>
+
+<section class="page-intro"><a href="/admin" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Platform dashboard</a><span class="eyebrow">COMMUNITY MANAGEMENT</span><h1>Users</h1><p>Review accounts and adjust platform roles.</p></section>
+<div class="management-table-wrap">
+    <table class="management-table"><thead><tr><th scope="col">Member</th><th scope="col">Email</th><th scope="col">Role</th><th scope="col">Change role</th></tr></thead><tbody>
+        <% for (const member of users) { %><tr>
+            <td><strong><%= member.username %></strong><small>Joined <%= member.createdAt ? member.createdAt.toLocaleDateString("en-IN") : "—" %></small></td>
+            <td><%= member.email %></td><td><span class="role-pill role-<%= member.role || "traveler" %>"><%= member.role || "traveler" %></span></td>
+            <td><% if (String(member._id) !== String(user._id)) { %><form class="inline-role-form" action="/admin/users/<%= member._id %>/role" method="post"><label class="visually-hidden" for="role-<%= member._id %>">Role for <%= member.username %></label><select id="role-<%= member._id %>" name="role" class="form-select form-select-sm"><% for (const role of ["traveler","host","admin"]) { %><option value="<%= role %>" <%= (member.role || "traveler") === role ? "selected" : "" %>><%= role %></option><% } %></select><button type="submit" class="btn btn-light btn-sm">Save</button></form><% } else { %><span class="text-muted small">Current administrator</span><% } %></td>
+        </tr><% } %>
+    </tbody></table>
+    <% if (!users.length) { %><div class="dashboard-empty">No user accounts to display.</div><% } %>
+</div>

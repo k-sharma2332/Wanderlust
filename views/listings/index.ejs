@@ -1,0 +1,130 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "All Listings" %>
+<% const pageFilters = typeof filters === "undefined" ? { q: "", location: "", minPrice: "", maxPrice: "", sort: "newest" } : filters %>
+
+<section class="home-hero">
+    <div class="home-hero-copy">
+        <span class="eyebrow hero-eyebrow">A WORLD OF STAYS, AROUND THE CORNER</span>
+        <h1>Go where you feel <em>most alive.</em></h1>
+        <p>Find a thoughtful place to stay, from slow mornings by the sea to weekends in the mountains.</p>
+    </div>
+    <div class="hero-note"><span class="hero-note-icon"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span><span>Stay curious.<br><strong>Stay somewhere memorable.</strong></span></div>
+</section>
+
+<section class="search-section" aria-label="Find a stay">
+    <div class="search-heading">
+        <div><span class="eyebrow">YOUR NEXT CHAPTER</span><h2>Find your kind of getaway</h2></div>
+        <p>Search stays by name, destination, or budget.</p>
+    </div>
+    <form action="/listings" method="GET" class="search-form" data-loading-label="Searching...">
+        <div class="search-field search-field-wide">
+            <label for="q"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> What are you looking for?</label>
+            <input id="q" name="q" class="form-control" value="<%= pageFilters.q %>" placeholder="A beach house, a quiet cabin..." autocomplete="off">
+        </div>
+        <div class="search-field">
+            <label for="location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Destination</label>
+            <input id="location" name="location" class="form-control" value="<%= pageFilters.location %>" placeholder="City or place">
+        </div>
+        <div class="search-field price-field">
+            <label for="minPrice"><i class="fa-solid fa-indian-rupee-sign" aria-hidden="true"></i> Budget per night</label>
+            <div class="price-inputs">
+                <input id="minPrice" name="minPrice" type="number" min="0" class="form-control" value="<%= pageFilters.minPrice %>" placeholder="Min" aria-label="Minimum price">
+                <span aria-hidden="true">—</span>
+                <input id="maxPrice" name="maxPrice" type="number" min="0" class="form-control" value="<%= pageFilters.maxPrice %>" placeholder="Max" aria-label="Maximum price">
+            </div>
+        </div>
+        <button class="btn btn-brand search-button" type="submit"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Explore stays</button>
+    </form>
+</section>
+
+<section class="category-section" aria-labelledby="category-heading">
+    <div class="section-heading">
+        <div><span class="eyebrow">A LITTLE INSPIRATION</span><h2 id="category-heading" class="section-title">Explore by feeling</h2></div>
+    </div>
+    <div class="category-list">
+        <a class="category-chip" href="/listings?q=beach"><span class="category-icon"><i class="fa-solid fa-umbrella-beach" aria-hidden="true"></i></span><span>By the sea</span></a>
+        <a class="category-chip" href="/listings?q=mountain"><span class="category-icon"><i class="fa-solid fa-mountain-sun" aria-hidden="true"></i></span><span>Mountain air</span></a>
+        <a class="category-chip" href="/listings?q=city"><span class="category-icon"><i class="fa-solid fa-city" aria-hidden="true"></i></span><span>City breaks</span></a>
+        <a class="category-chip" href="/listings?q=cabin"><span class="category-icon"><i class="fa-solid fa-house" aria-hidden="true"></i></span><span>Quiet hideaways</span></a>
+    </div>
+</section>
+
+<section class="stays-section" aria-labelledby="stays-heading">
+    <div class="listings-toolbar">
+        <div>
+            <span class="eyebrow">PLACES TO CALL YOUR OWN</span>
+            <h2 id="stays-heading" class="section-title">Stays worth the journey <span class="count-badge"><%= result.length %></span></h2>
+            <p class="toolbar-subtitle">Find a space to slow down, explore, and feel at home.</p>
+        </div>
+        <div class="listing-tools">
+            <% if (user) { %>
+                <a href="/listings/new" class="btn btn-outline-brand"><i class="fa-solid fa-plus" aria-hidden="true"></i> Share a stay</a>
+            <% } %>
+            <form action="/listings" method="GET" class="sort-form">
+                <input type="hidden" name="q" value="<%= pageFilters.q %>">
+                <input type="hidden" name="location" value="<%= pageFilters.location %>">
+                <input type="hidden" name="minPrice" value="<%= pageFilters.minPrice %>">
+                <input type="hidden" name="maxPrice" value="<%= pageFilters.maxPrice %>">
+                <label for="sort">Sort</label>
+                <select id="sort" name="sort" class="form-select sort-select" onchange="this.form.submit()">
+                    <option value="newest" <%= pageFilters.sort === "newest" ? "selected" : "" %>>Newest</option>
+                    <option value="price-low" <%= pageFilters.sort === "price-low" ? "selected" : "" %>>Price: low to high</option>
+                    <option value="price-high" <%= pageFilters.sort === "price-high" ? "selected" : "" %>>Price: high to low</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <% if (!result.length) { %>
+        <div class="empty-state" role="status">
+            <span class="empty-state-icon"><i class="fa-regular fa-compass" aria-hidden="true"></i></span>
+            <h3>No stays found just yet</h3>
+            <p>Try another destination or adjust your filters. Your next great find might be one search away.</p>
+            <a href="/listings" class="btn btn-outline-brand">Clear search</a>
+        </div>
+    <% } else { %>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 listing-results">
+            <% for (const listing of result) { %>
+                <div class="col">
+                        <article class="card h-100 listing-card">
+                            <a href="/listings/<%= listing._id %>" class="listing-card-link">
+                            <div class="listing-image-wrap">
+                                <img src="<%= listing.image %>" class="card-img-top" alt="<%= listing.title %>" loading="lazy">
+                                <span class="image-badge"><i class="fa-regular fa-compass" aria-hidden="true"></i> Wanderlust stay</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="listing-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <%= listing.location %>, <%= listing.country %></div>
+                                <h3 class="card-title"><%= listing.title %></h3>
+                                <% if (listing.ratingCount) { %>
+                                    <p class="listing-card-rating"><i class="fa-solid fa-star" aria-hidden="true"></i> <strong><%= listing.averageRating.toFixed(1) %></strong> <span>· <%= listing.ratingCount %> <%= listing.ratingCount === 1 ? "review" : "reviews" %></span></p>
+                                <% } %>
+                                <p class="listing-price"><strong>₹<%= listing.price.toLocaleString("en-IN") %></strong> <span>per night</span></p>
+                            </div>
+                            </a>
+                            <% if (user) { %>
+                                <% const isSaved = savedListingIds.includes(String(listing._id)); %>
+                                <form class="card-wishlist-form" action="/wishlist/<%= listing._id %><%= isSaved ? '?_method=DELETE' : '' %>" method="post" aria-label="<%= isSaved ? 'Remove from' : 'Save to' %> wishlist">
+                                    <button class="wishlist-button <%= isSaved ? 'is-saved' : '' %>" type="submit" aria-label="<%= isSaved ? 'Remove ' + listing.title + ' from wishlist' : 'Save ' + listing.title + ' to wishlist' %>" title="<%= isSaved ? 'Remove from wishlist' : 'Save to wishlist' %>">
+                                        <i class="<%= isSaved ? 'fa-solid' : 'fa-regular' %> fa-heart" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            <% } %>
+                        </article>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</section>
+
+<section class="how-it-works">
+    <div class="section-intro">
+        <span class="eyebrow">THE WANDERLUST WAY</span>
+        <h2>A better stay starts with a little curiosity.</h2>
+        <p>Discover a destination, find a space that feels right, and share what made it special.</p>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-4"><article class="feature-box"><span class="feature-number">01 / DISCOVER</span><h3>Follow your curiosity</h3><p>Search by destination, keyword, or budget and uncover a place that fits your trip.</p></article></div>
+        <div class="col-md-4"><article class="feature-box"><span class="feature-number">02 / STAY</span><h3>Feel at home, anywhere</h3><p>Explore welcoming stays with clear details, thoughtful hosts, and room to unwind.</p></article></div>
+        <div class="col-md-4"><article class="feature-box"><span class="feature-number">03 / SHARE</span><h3>Pass the feeling on</h3><p>Leave a review or share your own space with a community of fellow travelers.</p></article></div>
+    </div>
+</section>

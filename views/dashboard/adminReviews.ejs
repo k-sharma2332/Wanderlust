@@ -1,0 +1,11 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Moderate reviews" %>
+
+<section class="page-intro"><a href="/admin" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Platform dashboard</a><span class="eyebrow">COMMUNITY MODERATION</span><h1>Reviews</h1><p>Review feedback is linked to its author and stay.</p></section>
+<div class="moderation-list">
+    <% for (const review of reviews) { %><article class="moderation-card">
+        <div class="moderation-heading"><div><p class="starability-result" data-rating="<%= review.rating %>"></p><strong><%= review.author ? review.author.username : review.authorName || "Former member" %></strong><span> on <%= review.listing ? review.listing.title : "Deleted listing" %></span></div><form action="/admin/reviews/<%= review._id %>/delete" method="post" onsubmit="return confirm('Remove this review?')"><button type="submit" class="btn btn-outline-danger btn-sm">Remove review</button></form></div>
+        <p><%= review.comment %></p><small><%= review.createdAt.toLocaleDateString("en-IN") %></small>
+    </article><% } %>
+    <% if (!reviews.length) { %><div class="dashboard-empty">No reviews to display.</div><% } %>
+</div>

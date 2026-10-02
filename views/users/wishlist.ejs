@@ -1,0 +1,38 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Your wishlist" %>
+
+<section class="page-intro">
+    <a href="/profile" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Your profile</a>
+    <span class="eyebrow">THE STAYS THAT STAY WITH YOU</span>
+    <h1>Your wishlist</h1>
+    <p>Places you’ve saved for a future you’re looking forward to.</p>
+</section>
+
+<% if (savedListings.length) { %>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+        <% for (const listing of savedListings) { %>
+            <div class="col">
+                <article class="card h-100 listing-card">
+                    <a href="/listings/<%= listing._id %>" class="listing-card-link">
+                        <div class="listing-image-wrap"><img src="<%= listing.image %>" class="card-img-top" alt="<%= listing.title %>" loading="lazy"></div>
+                        <div class="card-body">
+                            <div class="listing-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <%= listing.location %>, <%= listing.country %></div>
+                            <h2 class="card-title"><%= listing.title %></h2>
+                            <p class="listing-price"><strong>₹<%= listing.price.toLocaleString("en-IN") %></strong> <span>per night</span></p>
+                        </div>
+                    </a>
+                    <form class="saved-card-action" action="/wishlist/<%= listing._id %>?_method=DELETE" method="post">
+                        <button type="submit" class="btn btn-light btn-sm"><i class="fa-solid fa-heart" aria-hidden="true"></i> Remove from wishlist</button>
+                    </form>
+                </article>
+            </div>
+        <% } %>
+    </div>
+<% } else { %>
+    <div class="empty-state wishlist-empty" role="status">
+        <span class="empty-state-icon"><i class="fa-regular fa-heart" aria-hidden="true"></i></span>
+        <h2>Your next favorite might be one search away.</h2>
+        <p>Save the stays you love and keep your travel inspiration in one place.</p>
+        <a href="/listings" class="btn btn-brand">Explore stays</a>
+    </div>
+<% } %>

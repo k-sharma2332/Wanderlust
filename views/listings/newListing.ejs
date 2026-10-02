@@ -1,0 +1,104 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Add a stay" %>
+
+<div class="form-page">
+    <a href="/listings" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to stays</a>
+    <div class="form-heading">
+        <span class="eyebrow">SHARE YOUR SPACE</span>
+        <h1>Add a new stay</h1>
+        <p>Tell travelers what makes your place special.</p>
+    </div>
+    <form action="/listings" method="post" enctype="multipart/form-data" class="listing-form needs-validation" data-loading-label="Publishing listing...">
+        <div class="form-section-heading"><span>THE ESSENTIALS</span><p>Give travelers a clear picture of your place.</p></div>
+        <div class="mb-4">
+            <label for="title" class="form-label">Title</label>
+            <input id="title" name="listing[title]" class="form-control" type="text" placeholder="e.g. Sunlit cabin above the clouds" minlength="2" maxlength="100" required>
+            <div class="invalid-feedback">Please add a title between 2 and 100 characters.</div>
+        </div>
+        <div class="mb-4">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" name="listing[description]" class="form-control" rows="5" placeholder="What should guests know before they arrive?" minlength="10" maxlength="2000" required></textarea>
+            <div class="invalid-feedback">Please add at least 10 characters describing the stay.</div>
+        </div>
+        <div class="mb-4">
+            <label for="image" class="form-label">Image URL <span class="text-muted">(optional)</span></label>
+            <input id="image" name="listing[image]" class="form-control" type="url" placeholder="https://images.unsplash.com/...">
+            <div class="form-text">Optional fallback image URL. Uploaded photos appear first.</div>
+        </div>
+        <div class="mb-4">
+            <label for="images" class="form-label">Upload photos <span class="text-muted">(up to 8, JPEG / PNG / WebP)</span></label>
+            <input id="images" name="images" class="form-control" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+            <div class="form-text">Choose clear, well-lit photos of your stay. Each photo can be up to 5 MB.</div>
+        </div>
+        <div class="form-section-heading mt-4"><span>ABOUT THE SPACE</span><p>Help guests know what to expect.</p></div>
+        <div class="row g-3">
+            <div class="mb-3 col-md-6">
+                <label for="propertyType" class="form-label">Property type</label>
+                <select id="propertyType" name="listing[propertyType]" class="form-select" required>
+                    <option value="" selected disabled>Choose a type</option>
+                    <option value="apartment">Apartment</option><option value="cabin">Cabin</option>
+                    <option value="guesthouse">Guesthouse</option><option value="hotel">Hotel</option>
+                    <option value="house">House</option><option value="villa">Villa</option><option value="other">Other</option>
+                </select>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label for="maximumGuests" class="form-label">Maximum guests</label>
+                <input id="maximumGuests" name="listing[maximumGuests]" class="form-control" type="number" min="1" max="50" value="2" required>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label for="bedrooms" class="form-label">Bedrooms</label>
+                <input id="bedrooms" name="listing[bedrooms]" class="form-control" type="number" min="0" max="50" value="1" required>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label for="bathrooms" class="form-label">Bathrooms</label>
+                <input id="bathrooms" name="listing[bathrooms]" class="form-control" type="number" min="0" max="50" step="0.5" value="1" required>
+            </div>
+        </div>
+        <fieldset class="amenities-fieldset mb-4">
+            <legend class="form-label">Amenities</legend>
+            <div class="amenities-grid">
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="wifi"><span>Wi-Fi</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="kitchen"><span>Kitchen</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="air-conditioning"><span>Air conditioning</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="heating"><span>Heating</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="parking"><span>Parking</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="pool"><span>Pool</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="workspace"><span>Workspace</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="washer"><span>Washer</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="pets-allowed"><span>Pets allowed</span></label>
+                <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="breakfast"><span>Breakfast</span></label>
+            </div>
+        </fieldset>
+        <div class="form-section-heading mt-4"><span>LOCATION DETAILS</span><p>Coordinates are optional and power the interactive listing map.</p></div>
+        <div class="row g-3">
+            <div class="mb-4 col-md-5">
+                <label for="price" class="form-label">Price per night (₹)</label>
+                <input id="price" name="listing[price]" class="form-control" type="number" min="0" step="1" placeholder="2500" required>
+                <div class="invalid-feedback">Please enter a price of ₹0 or more.</div>
+            </div>
+            <div class="mb-4 col-md-7">
+                <label for="location" class="form-label">Location</label>
+                <input id="location" name="listing[location]" class="form-control" type="text" placeholder="e.g. Manali" minlength="2" maxlength="100" required>
+                <div class="invalid-feedback">Please add a location.</div>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label for="country" class="form-label">Country</label>
+            <input id="country" name="listing[country]" class="form-control" type="text" placeholder="e.g. India" minlength="2" maxlength="100" required>
+        </div>
+        <div class="row g-3">
+            <div class="mb-4 col-md-6"><label for="latitude" class="form-label">Latitude <span class="text-muted">(optional)</span></label><input id="latitude" name="listing[latitude]" class="form-control" type="number" min="-90" max="90" step="any" placeholder="e.g. 32.2432"></div>
+            <div class="mb-4 col-md-6"><label for="longitude" class="form-label">Longitude <span class="text-muted">(optional)</span></label><input id="longitude" name="listing[longitude]" class="form-control" type="number" min="-180" max="180" step="any" placeholder="e.g. 77.1892"></div>
+        </div>
+        <div class="coordinate-picker">
+            <div class="coordinate-picker-heading"><div><strong>Choose a map point</strong><span>Click the map or use your current location.</span></div><button class="btn btn-light btn-sm" type="button" data-use-location><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i> Use my location</button></div>
+            <div id="coordinatePicker" class="listing-map map-picker" role="application" aria-label="Click to select listing coordinates" data-latitude="" data-longitude=""></div>
+            <p class="map-privacy-note">Only the coordinates are stored. For guest privacy, choose an approximate area rather than a private entrance.</p>
+            <div class="invalid-feedback">Please add a country.</div>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-brand" type="submit">Publish listing</button>
+            <a class="btn btn-light" href="/listings">Cancel</a>
+        </div>
+    </form>
+</div>

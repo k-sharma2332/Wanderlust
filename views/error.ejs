@@ -1,0 +1,11 @@
+<% layout('/layouts/boilerplate') %>
+<section class="error-page">
+    <span class="error-icon"><i class="fa-solid fa-route" aria-hidden="true"></i></span>
+    <span class="eyebrow">A SMALL DETOUR</span>
+    <h1>We couldn’t find the right path.</h1>
+    <p class="error-message"><%= err.message %></p>
+    <div class="error-actions">
+        <a href="/listings" class="btn btn-brand">Back to exploring</a>
+        <button type="button" class="btn btn-light" onclick="history.back()">Go back</button>
+    </div>
+</section>

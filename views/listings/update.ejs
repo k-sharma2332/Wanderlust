@@ -1,0 +1,94 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Edit " + listing.title %>
+
+<div class="form-page">
+    <a href="/listings/<%= listing._id %>" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to listing</a>
+    <div class="form-heading">
+        <span class="eyebrow">KEEP IT CURRENT</span>
+        <h1>Edit your stay</h1>
+        <p>Make sure your listing reflects the experience guests can expect.</p>
+    </div>
+    <form method="post" action="/listings/<%= listing._id %>?_method=PUT" enctype="multipart/form-data" class="listing-form needs-validation" data-loading-label="Saving changes...">
+        <div class="form-section-heading"><span>THE ESSENTIALS</span><p>Update the details guests see when they find your place.</p></div>
+        <div class="mb-4">
+            <label for="title" class="form-label">Title</label>
+            <input id="title" name="listing[title]" class="form-control" type="text" value="<%= listing.title %>" minlength="2" maxlength="100" required>
+        </div>
+        <div class="mb-4">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" name="listing[description]" class="form-control" rows="5" minlength="10" maxlength="2000" required><%= listing.description %></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="image" class="form-label">Fallback image URL <span class="text-muted">(optional)</span></label>
+            <input id="image" name="listing[image]" class="form-control" type="url" value="<%= listing.images.length ? "" : listing.image %>">
+        </div>
+        <% if (listing.images.length) { %>
+            <fieldset class="existing-images mb-4">
+                <legend class="form-label">Current photo gallery <span class="text-muted">· uncheck a photo to remove it</span></legend>
+                <div class="existing-image-grid">
+                    <% for (const image of listing.images) { %>
+                        <label class="existing-image">
+                            <img src="<%= image.url %>" alt="Current photo of <%= listing.title %>" loading="lazy">
+                            <span><input type="checkbox" name="listing[removeImages]" value="<%= image._id %>"> Remove photo</span>
+                        </label>
+                    <% } %>
+                </div>
+            </fieldset>
+        <% } %>
+        <div class="mb-4">
+            <label for="images" class="form-label">Add photos <span class="text-muted">(JPEG / PNG / WebP, up to 8 photos total)</span></label>
+            <input id="images" name="images" class="form-control" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+            <div class="form-text">Each photo can be up to 5 MB.</div>
+        </div>
+        <div class="form-section-heading mt-4"><span>ABOUT THE SPACE</span><p>Keep the property details accurate for upcoming guests.</p></div>
+        <div class="row g-3">
+            <div class="mb-3 col-md-6">
+                <label for="propertyType" class="form-label">Property type</label>
+                <select id="propertyType" name="listing[propertyType]" class="form-select" required>
+                    <% const propertyTypes = [["apartment","Apartment"],["cabin","Cabin"],["guesthouse","Guesthouse"],["hotel","Hotel"],["house","House"],["villa","Villa"],["other","Other"]]; %>
+                    <% for (const [value, label] of propertyTypes) { %><option value="<%= value %>" <%= (listing.propertyType || "other") === value ? "selected" : "" %>><%= label %></option><% } %>
+                </select>
+            </div>
+            <div class="mb-3 col-md-6"><label for="maximumGuests" class="form-label">Maximum guests</label><input id="maximumGuests" name="listing[maximumGuests]" class="form-control" type="number" min="1" max="50" value="<%= listing.maximumGuests || 2 %>" required></div>
+            <div class="mb-3 col-md-6"><label for="bedrooms" class="form-label">Bedrooms</label><input id="bedrooms" name="listing[bedrooms]" class="form-control" type="number" min="0" max="50" value="<%= listing.bedrooms ?? 1 %>" required></div>
+            <div class="mb-3 col-md-6"><label for="bathrooms" class="form-label">Bathrooms</label><input id="bathrooms" name="listing[bathrooms]" class="form-control" type="number" min="0" max="50" step="0.5" value="<%= listing.bathrooms ?? 1 %>" required></div>
+        </div>
+        <fieldset class="amenities-fieldset mb-4">
+            <legend class="form-label">Amenities</legend>
+            <div class="amenities-grid">
+                <% const amenities = [["wifi","Wi-Fi"],["kitchen","Kitchen"],["air-conditioning","Air conditioning"],["heating","Heating"],["parking","Parking"],["pool","Pool"],["workspace","Workspace"],["washer","Washer"],["pets-allowed","Pets allowed"],["breakfast","Breakfast"]]; %>
+                <% for (const [value, label] of amenities) { %>
+                    <label class="amenity-option"><input type="checkbox" name="listing[amenities]" value="<%= value %>" <%= (listing.amenities || []).includes(value) ? "checked" : "" %>><span><%= label %></span></label>
+                <% } %>
+            </div>
+        </fieldset>
+        <div class="form-section-heading mt-4"><span>LOCATION DETAILS</span><p>Coordinates are optional and power the interactive listing map.</p></div>
+        <div class="row g-3">
+            <div class="mb-4 col-md-6">
+                <label for="location" class="form-label">Location</label>
+                <input id="location" name="listing[location]" class="form-control" type="text" value="<%= listing.location %>" minlength="2" maxlength="100" required>
+            </div>
+            <div class="mb-4 col-md-6">
+                <label for="country" class="form-label">Country</label>
+                <input id="country" name="listing[country]" class="form-control" type="text" value="<%= listing.country %>" minlength="2" maxlength="100" required>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="mb-4 col-md-6"><label for="latitude" class="form-label">Latitude <span class="text-muted">(optional)</span></label><input id="latitude" name="listing[latitude]" class="form-control" type="number" min="-90" max="90" step="any" value="<%= listing.latitude ?? "" %>"></div>
+            <div class="mb-4 col-md-6"><label for="longitude" class="form-label">Longitude <span class="text-muted">(optional)</span></label><input id="longitude" name="listing[longitude]" class="form-control" type="number" min="-180" max="180" step="any" value="<%= listing.longitude ?? "" %>"></div>
+        </div>
+        <div class="coordinate-picker">
+            <div class="coordinate-picker-heading"><div><strong>Update map point</strong><span>Click to move the marker or use your current location.</span></div><button class="btn btn-light btn-sm" type="button" data-use-location><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i> Use my location</button></div>
+            <div id="coordinatePicker" class="listing-map map-picker" role="application" aria-label="Click to select listing coordinates" data-latitude="<%= listing.latitude ?? "" %>" data-longitude="<%= listing.longitude ?? "" %>"></div>
+            <p class="map-privacy-note">Coordinates help travelers understand the area. Use an approximate location if needed.</p>
+        </div>
+        <div class="mb-4">
+            <label for="price" class="form-label">Price per night (₹)</label>
+            <input id="price" name="listing[price]" class="form-control" type="number" min="0" step="1" value="<%= listing.price %>" required>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-brand" type="submit">Save changes</button>
+            <a class="btn btn-light" href="/listings/<%= listing._id %>">Cancel</a>
+        </div>
+    </form>
+</div>

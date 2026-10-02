@@ -1,0 +1,54 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Travel Assistant" %>
+
+<section class="assistant-hero">
+    <span class="assistant-orb"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i></span>
+    <span class="eyebrow">A THOUGHTFUL TRAVEL COMPANION</span>
+    <h1>Tell us what you’re dreaming of.</h1>
+    <p>I’ll look through real Wanderlust stays and help you find a good fit.</p>
+</section>
+
+<section class="assistant-shell" aria-label="Travel Assistant">
+    <div class="assistant-disclaimer"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Recommendations are based only on current Wanderlust listings. Availability is not checked here; send a booking request to ask the host.</span></div>
+    <form class="assistant-form" action="/assistant" method="post" data-loading-label="Looking through stays...">
+        <label for="travelQuery">What kind of trip are you planning?</label>
+        <textarea id="travelQuery" name="query" rows="3" minlength="5" maxlength="500" required placeholder="For example: I’d love a peaceful mountain stay for 3 people under ₹5000 per night."><%= query %></textarea>
+        <div class="assistant-form-footer"><span>Be as specific or as open-ended as you like.</span><button type="submit" class="btn btn-brand"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Find my stay</button></div>
+    </form>
+
+    <% if (preferences) { %>
+        <section class="assistant-response" aria-live="polite">
+            <div class="assistant-user-message"><span class="assistant-message-avatar"><i class="fa-regular fa-user" aria-hidden="true"></i></span><p><%= query %></p></div>
+            <div class="assistant-answer">
+                <span class="assistant-message-avatar assistant-ai-avatar"><i class="fa-solid fa-compass" aria-hidden="true"></i></span>
+                <div>
+                    <span class="eyebrow">WANDERLUST ASSISTANT</span>
+                    <p class="assistant-answer-message"><%= message %></p>
+                    <div class="preference-chips">
+                        <% if (preferences.location) { %><span><i class="fa-solid fa-location-dot" aria-hidden="true"></i><%= preferences.location %></span><% } %>
+                        <% if (preferences.maxPrice !== null) { %><span><i class="fa-solid fa-indian-rupee-sign" aria-hidden="true"></i>Up to ₹<%= preferences.maxPrice.toLocaleString("en-IN") %> / night</span><% } %>
+                        <% if (preferences.guests) { %><span><i class="fa-solid fa-user-group" aria-hidden="true"></i><%= preferences.guests %> guests</span><% } %>
+                        <% if (preferences.propertyType) { %><span><i class="fa-solid fa-house" aria-hidden="true"></i><%= preferences.propertyType %></span><% } %>
+                        <% if (preferences.preference) { %><span><i class="fa-regular fa-sun" aria-hidden="true"></i><%= preferences.preference %></span><% } %>
+                    </div>
+                </div>
+            </div>
+            <% if (recommendations && recommendations.length) { %>
+                <div class="assistant-results">
+                    <% for (const { listing, reason } of recommendations) { %>
+                        <article class="assistant-result-card">
+                            <a href="/listings/<%= listing._id %>" class="assistant-result-image"><img src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy"></a>
+                            <div class="assistant-result-body">
+                                <span class="listing-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <%= listing.location %>, <%= listing.country %></span>
+                                <h2><a href="/listings/<%= listing._id %>"><%= listing.title %></a></h2>
+                                <p><%= reason %></p>
+                                <div><strong>₹<%= listing.price.toLocaleString("en-IN") %></strong> / night · up to <%= listing.maximumGuests || 2 %> guests</div>
+                            </div>
+                            <a class="btn btn-outline-brand assistant-view-link" href="/listings/<%= listing._id %>">View stay</a>
+                        </article>
+                    <% } %>
+                </div>
+            <% } %>
+        </section>
+    <% } %>
+</section>

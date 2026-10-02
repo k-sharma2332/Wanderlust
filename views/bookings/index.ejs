@@ -1,0 +1,34 @@
+<% layout('/layouts/boilerplate') %>
+<% title = dashboardTitle %>
+
+<section class="page-intro">
+    <a href="/dashboard" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+    <span class="eyebrow"><%= userRole === "host" ? "HOST WORKSPACE" : "YOUR TRAVEL PLANS" %></span>
+    <h1><%= dashboardTitle %></h1>
+    <p><%= dashboardDescription %></p>
+</section>
+
+<% if (bookings.length) { %>
+    <div class="booking-list">
+        <% for (const booking of bookings) { %>
+            <a class="booking-row" href="/bookings/<%= booking._id %>">
+                <img src="<%= booking.listing ? booking.listing.image : booking.listingSnapshot.image %>" alt="" loading="lazy">
+                <span class="booking-row-main">
+                    <strong><%= booking.listing ? booking.listing.title : booking.listingSnapshot.title %></strong>
+                    <small><%= booking.listing ? booking.listing.location : booking.listingSnapshot.location %> · <%= booking.checkIn.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) %> – <%= booking.checkOut.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) %></small>
+                    <% if (userRole === "host" && booking.traveler) { %><small>Requested by <%= booking.traveler.username %> · <%= booking.guests %> <%= booking.guests === 1 ? "guest" : "guests" %></small><% } %>
+                </span>
+                <span class="booking-total">₹<%= booking.totalPrice.toLocaleString("en-IN") %><small><%= booking.nights %> <%= booking.nights === 1 ? "night" : "nights" %></small></span>
+                <span class="status-pill status-<%= booking.status %>"><%= booking.status %></span>
+                <i class="fa-solid fa-chevron-right booking-chevron" aria-hidden="true"></i>
+            </a>
+        <% } %>
+    </div>
+<% } else { %>
+    <div class="empty-state booking-empty" role="status">
+        <span class="empty-state-icon"><i class="fa-regular fa-calendar" aria-hidden="true"></i></span>
+        <h2><%= userRole === "host" ? "No booking requests yet" : "Your travel calendar is open" %></h2>
+        <p><%= userRole === "host" ? "When a traveler requests one of your stays, you’ll see it here." : "When you request a stay, its dates and status will appear here." %></p>
+        <% if (userRole !== "host") { %><a href="/listings" class="btn btn-brand">Explore stays</a><% } %>
+    </div>
+<% } %>

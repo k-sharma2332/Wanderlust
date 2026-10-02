@@ -1,0 +1,47 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Booking details" %>
+
+<section class="page-intro">
+    <a href="<%= booking.traveler._id.equals(user._id) ? '/bookings' : '/host/bookings' %>" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to bookings</a>
+    <span class="eyebrow">BOOKING DETAILS</span>
+    <h1>Your stay, at a glance.</h1>
+</section>
+<div class="booking-detail-layout">
+    <article class="booking-detail-card">
+        <img class="booking-detail-image" src="<%= booking.listing ? booking.listing.image : booking.listingSnapshot.image %>" alt="<%= booking.listing ? booking.listing.title : booking.listingSnapshot.title %>">
+        <div class="booking-detail-body">
+            <div class="booking-title-row">
+                <div><span class="eyebrow"><%= booking.listing ? booking.listing.location : booking.listingSnapshot.location %></span><h2><%= booking.listing ? booking.listing.title : booking.listingSnapshot.title %></h2></div>
+                <span class="status-pill status-<%= booking.status %>"><%= booking.status %></span>
+            </div>
+            <div class="booking-facts">
+                <div><span>CHECK-IN</span><strong><%= booking.checkIn.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }) %></strong></div>
+                <div><span>CHECK-OUT</span><strong><%= booking.checkOut.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }) %></strong></div>
+                <div><span>GUESTS</span><strong><%= booking.guests %> <%= booking.guests === 1 ? "guest" : "guests" %></strong></div>
+                <div><span>DURATION</span><strong><%= booking.nights %> <%= booking.nights === 1 ? "night" : "nights" %></strong></div>
+            </div>
+            <div class="booking-participants">
+                <p><span><i class="fa-regular fa-user" aria-hidden="true"></i> Traveler</span><strong><%= booking.traveler.username %></strong></p>
+                <p><span><i class="fa-solid fa-house" aria-hidden="true"></i> Host</span><strong><%= booking.host.username %></strong></p>
+            </div>
+            <p class="booking-created">Requested on <%= booking.createdAt.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) %></p>
+        </div>
+    </article>
+    <aside class="booking-total-card">
+        <span class="eyebrow">PRICE SUMMARY</span>
+        <p class="booking-math"><span>₹<%= booking.nightlyRate.toLocaleString("en-IN") %> × <%= booking.nights %> <%= booking.nights === 1 ? "night" : "nights" %></span><strong>₹<%= booking.totalPrice.toLocaleString("en-IN") %></strong></p>
+        <div class="booking-total-line"><span>Estimated total</span><strong>₹<%= booking.totalPrice.toLocaleString("en-IN") %></strong></div>
+        <p class="no-payment-note">No payment has been collected. Payment processing is not enabled.</p>
+        <% if (canCancel) { %>
+            <form action="/bookings/<%= booking._id %>/cancel" method="post" onsubmit="return confirm('Cancel this booking?')">
+                <button type="submit" class="btn btn-outline-danger w-100" data-loading-label="Cancelling...">Cancel booking</button>
+            </form>
+        <% } %>
+        <% if (canManage) { %>
+            <div class="booking-host-actions">
+                <form action="/host/bookings/<%= booking._id %>/confirm" method="post"><button type="submit" class="btn btn-brand w-100" data-loading-label="Confirming...">Confirm request</button></form>
+                <form action="/host/bookings/<%= booking._id %>/reject" method="post" onsubmit="return confirm('Decline this request?')"><button type="submit" class="btn btn-light w-100">Decline request</button></form>
+            </div>
+        <% } %>
+    </aside>
+</div>

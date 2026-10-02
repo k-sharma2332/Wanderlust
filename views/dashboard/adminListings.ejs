@@ -1,0 +1,7 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Manage listings" %>
+
+<section class="page-intro"><a href="/admin" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Platform dashboard</a><span class="eyebrow">CATALOG MANAGEMENT</span><h1>Listings</h1><p>Review published stays across Wanderlust.</p></section>
+<div class="management-table-wrap"><table class="management-table"><thead><tr><th scope="col">Stay</th><th scope="col">Host</th><th scope="col">Price</th><th scope="col">Manage</th></tr></thead><tbody>
+    <% for (const listing of listings) { %><tr><td><a class="management-listing-link" href="/listings/<%= listing._id %>"><strong><%= listing.title %></strong><small><%= listing.location %>, <%= listing.country %></small></a></td><td><%= listing.owner ? listing.owner.username : "Unassigned" %></td><td>₹<%= listing.price.toLocaleString("en-IN") %> / night</td><td><form action="/admin/listings/<%= listing._id %>/delete" method="post" onsubmit="return confirm('Remove this listing and its related bookings and reviews?')"><button class="btn btn-outline-danger btn-sm" type="submit">Remove</button></form></td></tr><% } %>
+</tbody></table><% if (!listings.length) { %><div class="dashboard-empty">No listings to display.</div><% } %></div>

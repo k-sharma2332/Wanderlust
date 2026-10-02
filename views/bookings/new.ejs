@@ -1,0 +1,38 @@
+<% layout('/layouts/boilerplate') %>
+<% title = "Request " + listing.title %>
+
+<section class="booking-page">
+    <a href="/listings/<%= listing._id %>" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to stay</a>
+    <div class="booking-layout">
+        <div>
+            <span class="eyebrow">MAKE IT A TRIP</span>
+            <h1>Request your stay</h1>
+            <p class="booking-lede">Send a request to the host. You won’t be charged at this stage.</p>
+            <form class="booking-form" action="/listings/<%= listing._id %>/bookings" method="post" data-price="<%= listing.price %>" data-loading-label="Sending request...">
+                <div class="form-section-heading"><span>YOUR TRIP</span><p>Choose the dates and number of guests.</p></div>
+                <div class="row g-3">
+                    <div class="col-sm-6"><label for="checkIn" class="form-label">Check-in</label><input id="checkIn" name="booking[checkIn]" type="date" min="<%= today %>" class="form-control" required></div>
+                    <div class="col-sm-6"><label for="checkOut" class="form-label">Check-out</label><input id="checkOut" name="booking[checkOut]" type="date" min="<%= today %>" class="form-control" required></div>
+                    <div class="col-sm-6"><label for="guests" class="form-label">Guests</label><input id="guests" name="booking[guests]" type="number" min="1" max="<%= listing.maximumGuests || 2 %>" value="1" class="form-control" required><div class="form-text">Up to <%= listing.maximumGuests || 2 %> guests for this stay.</div></div>
+                </div>
+                <div class="booking-submit-row">
+                    <p>Booking requests are confirmed by the host.</p>
+                    <button type="submit" class="btn btn-brand" data-loading-label="Sending request...">Send booking request</button>
+                </div>
+            </form>
+        </div>
+        <aside class="booking-summary" aria-label="Price estimate">
+            <img src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy">
+            <div class="booking-summary-body">
+                <span class="eyebrow"><%= listing.location %>, <%= listing.country %></span>
+                <h2><%= listing.title %></h2>
+                <p class="booking-rate"><strong>₹<%= listing.price.toLocaleString("en-IN") %></strong> per night</p>
+                <div class="price-estimate" aria-live="polite">
+                    <span>Estimated total</span><strong id="estimatedTotal">Choose dates</strong>
+                    <small id="estimatedNights">No payment is collected now.</small>
+                </div>
+                <p class="booking-summary-note"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> Your request goes directly to the host.</p>
+            </div>
+        </aside>
+    </div>
+</section>
